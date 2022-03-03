@@ -20,6 +20,7 @@
 # API Dependencies
 import pickle
 import json
+import preprocessing_methods
 import numpy as np
 import pandas as pd
 from model import load_model, make_prediction
@@ -56,7 +57,7 @@ def model_prediction():
     # prediction.
     output = make_prediction(data, static_model)
     # We finally package this prediction as a JSON object to deliver a valid
-    return jsonify([output])
+    return jsonify(output)
 
 # Configure Server Startup properties.
 # Note:

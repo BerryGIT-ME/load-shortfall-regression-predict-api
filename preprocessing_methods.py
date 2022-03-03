@@ -35,13 +35,12 @@ def split_time(df):
     return df
 
 
-def replace_valencia_pressure(df):
+def replace_valencia_pressure(df, test_df):
     '''
     Takes a pandas dataframe with three columns 'years', 'month', and 'Valencia_pressure'
     Replaces missing values in the 'Valencia_pressure' column with the monthly average
     '''
-    
-    sub_df = df[['years', 'months', 'Valencia_pressure']]
+    sub_df = test_df[['years', 'months', 'Valencia_pressure']]
     aggregate = sub_df.groupby(['years', 'months']).mean()
     
     for index, column in df[['Valencia_pressure']].iterrows():
@@ -52,12 +51,9 @@ def replace_valencia_pressure(df):
             
     return df
 
-def handle_categorical_column(input_df, column_name):
-    return pd.get_dummies(input_df, columns=[column_name], drop_first=True)
-
 def handle_categorical_column_v2(input_df):
     input_df = input_df.copy()
-    #input_df["Valencia_wind_deg"] = input_df["Valencia_wind_deg"].apply(lambda level: float(level.split("_")[1]))
+    input_df["Valencia_wind_deg"] = input_df["Valencia_wind_deg"].apply(lambda level: float(level.split("_")[1]))
     input_df["Seville_pressure"] = input_df["Seville_pressure"].apply(lambda level: float(level[2:]))
     return input_df
 

@@ -28,7 +28,6 @@ import pickle
 import json
 from sklearn.preprocessing import StandardScaler
 from preprocessing_methods import (
-    handle_categorical_column,
     split_time, 
     replace_valencia_pressure,
     handle_categorical_column_v2, 
@@ -39,8 +38,8 @@ from print_helper import myprint
 
 scaler = StandardScaler()
 
-train_df = pd.read_csv('utils/data/df_train.csv')
-test_df = train_df.drop(['load_shortfall_3h'], axis=1)
+test_df = pd.read_csv('utils/data/df_test.csv')
+#test_df = train_df.drop(['load_shortfall_3h'], axis=1)
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -62,7 +61,9 @@ def _preprocess_data(data):
     # Convert the json string to a python dictionary object
     feature_vector_dict = json.loads(data)
     # Load the dictionary as a Pandas DataFrame.
-    feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
+    req = pd.DataFrame.from_dict([feature_vector_dict])
+
+    # feature_vector_df = test_df
     # ---------------------------------------------------------------
     # NOTE: You will need to swap the lines below for your own data
     # preprocessing methods.
@@ -72,17 +73,17 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
-    feature_vector_df = split_time(feature_vector_df)
-    feature_vector_df = replace_valencia_pressure(feature_vector_df)
-    feature_vector_df = handle_categorical_column(feature_vector_df, "Valencia_wind_deg")
-    feature_vector_df = handle_categorical_column_v2(feature_vector_df)
-    feature_vector_df = handle_colinear_temp_cols(feature_vector_df)
-    X = drop_columns(feature_vector_df)
-    X = X.drop(['time', 'Unnamed: 0'], axis=1)
-    X = scaler.fit_transform(X)
+    req = split_time(req)
+    split_test_df = split_time(test_df)
+    req = replace_valencia_pressure(req, split_test_df)
+    req = handle_categorical_column_v2(req)
+    req = handle_colinear_temp_cols(req)
+    req = drop_columns(req)
+    req = req.drop(['time', 'Unnamed: 0'], axis=1)
+    #X = scaler.fit_transform(X)
     # ------------------------------------------------------------------------
 
-    return X # this should be of type dataframe
+    return req # this should be of type dataframe
 
 def load_model(path_to_model:str):
     """Adapter function to load our pretrained model into memory.
@@ -123,14 +124,13 @@ def make_prediction(data, model):
         A 1-D python list containing the model prediction.
 
     """
-    try:
-        # Data preprocessing.
+    try: 
+    # Data preprocessing.
         prep_data = _preprocess_data(data)
         # Perform prediction with model and preprocessed data.
         prediction = model.predict(prep_data)
         # Format as list for output standardisation.
-        return 0 #prediction[0].tolist()
+        return prediction.tolist()
     except:
-        myprint("error occured")
-        return 0 #prediction[0].tolist()
+        return ["An error occured Please try again with different parameters"]
     
