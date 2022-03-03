@@ -34,12 +34,10 @@ from preprocessing_methods import (
     handle_colinear_temp_cols, 
     drop_columns
 )
-from print_helper import myprint
 
 scaler = StandardScaler()
 
 test_df = pd.read_csv('utils/data/df_test.csv')
-split_test_df = split_time(test_df)
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -79,6 +77,7 @@ def _preprocess_data(data):
 
     # We split the time 
     req = split_time(req)
+    split_test_df = split_time(test_df)
     req = replace_valencia_pressure(req, split_test_df)
     split_test_df = replace_valencia_pressure(split_test_df.copy(), split_test_df)
     req = handle_categorical_column_v2(req)

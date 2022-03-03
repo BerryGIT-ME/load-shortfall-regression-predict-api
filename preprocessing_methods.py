@@ -1,8 +1,5 @@
 import pandas as pd
 
-train_df = pd.read_csv('utils/data/df_train.csv')
-test_df = train_df.drop(['load_shortfall_3h'], axis=1)
-
 def split_time(df):
     '''
     split_time takes a dataframe with a column named "time" and splits it into four new columns; year, months, days, hours.
