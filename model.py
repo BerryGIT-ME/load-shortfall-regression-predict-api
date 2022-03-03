@@ -22,10 +22,23 @@
 """
 
 # Helper Dependencies
+from base64 import standard_b64encode
 import numpy as np
 import pandas as pd
 import pickle
 import json
+from sklearn.preprocessing import StandardScaler
+from preprocessing_methods import (
+    split_time, 
+    replace_valencia_pressure, 
+    handle_categorical_column, 
+    handle_categorical_column_v2, 
+    handle_colinear_temp_cols, 
+    drop_columns
+)
+from print_helper import myprint
+
+scaler = StandardScaler()
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -58,10 +71,17 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
-    predict_vector = feature_vector_df[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
+    feature_vector_df = split_time(feature_vector_df)
+    feature_vector_df = replace_valencia_pressure(feature_vector_df)
+    feature_vector_df = handle_categorical_column(feature_vector_df, "Valencia_wind_deg")
+    feature_vector_df = handle_categorical_column_v2(feature_vector_df)
+    feature_vector_df = handle_colinear_temp_cols(feature_vector_df)
+    X = drop_columns(feature_vector_df)
+    X = X.drop(['time', 'Unnamed: 0'], axis=1)
+    #X = scaler.fit_transform(X)
     # ------------------------------------------------------------------------
 
-    return predict_vector
+    return X # this should be of type dataframe
 
 def load_model(path_to_model:str):
     """Adapter function to load our pretrained model into memory.
@@ -105,6 +125,6 @@ def make_prediction(data, model):
     # Data preprocessing.
     prep_data = _preprocess_data(data)
     # Perform prediction with model and preprocessed data.
-    prediction = model.predict(prep_data)
+    #prediction = model.predict(prep_data)
     # Format as list for output standardisation.
-    return prediction[0].tolist()
+    return prep_data #prediction[0].tolist()
