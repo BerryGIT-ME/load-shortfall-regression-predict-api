@@ -76,10 +76,18 @@ def _preprocess_data(data):
     req = split_time(req)
     split_test_df = split_time(test_df)
     req = replace_valencia_pressure(req, split_test_df)
+    split_test_df = replace_valencia_pressure(split_test_df.copy(), split_test_df)
     req = handle_categorical_column_v2(req)
-    req = handle_colinear_temp_cols(req)
-    req = drop_columns(req)
+    split_test_df = handle_categorical_column_v2(split_test_df)
     req = req.drop(['time', 'Unnamed: 0'], axis=1)
+    split_test_df = split_test_df.drop(['time', 'Unnamed: 0'], axis=1)
+    columns = split_test_df.columns
+    temp = scaler.fit_transform(pd.concat([split_test_df, req], ignore_index=True))
+    temp = pd.DataFrame(temp).iloc[-1,:]
+    temp = pd.DataFrame(temp).T
+    temp.columns = columns
+    req = handle_colinear_temp_cols(temp)
+    req = drop_columns(req)
     #X = scaler.fit_transform(X)
     # ------------------------------------------------------------------------
 
