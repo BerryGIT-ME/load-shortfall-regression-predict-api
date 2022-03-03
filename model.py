@@ -22,16 +22,15 @@
 """
 
 # Helper Dependencies
-from base64 import standard_b64encode
 import numpy as np
 import pandas as pd
 import pickle
 import json
 from sklearn.preprocessing import StandardScaler
 from preprocessing_methods import (
+    handle_categorical_column,
     split_time, 
-    replace_valencia_pressure, 
-    handle_categorical_column, 
+    replace_valencia_pressure,
     handle_categorical_column_v2, 
     handle_colinear_temp_cols, 
     drop_columns
@@ -39,6 +38,9 @@ from preprocessing_methods import (
 from print_helper import myprint
 
 scaler = StandardScaler()
+
+train_df = pd.read_csv('utils/data/df_train.csv')
+test_df = train_df.drop(['load_shortfall_3h'], axis=1)
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -61,7 +63,6 @@ def _preprocess_data(data):
     feature_vector_dict = json.loads(data)
     # Load the dictionary as a Pandas DataFrame.
     feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
-
     # ---------------------------------------------------------------
     # NOTE: You will need to swap the lines below for your own data
     # preprocessing methods.
@@ -78,7 +79,7 @@ def _preprocess_data(data):
     feature_vector_df = handle_colinear_temp_cols(feature_vector_df)
     X = drop_columns(feature_vector_df)
     X = X.drop(['time', 'Unnamed: 0'], axis=1)
-    #X = scaler.fit_transform(X)
+    X = scaler.fit_transform(X)
     # ------------------------------------------------------------------------
 
     return X # this should be of type dataframe
@@ -122,9 +123,14 @@ def make_prediction(data, model):
         A 1-D python list containing the model prediction.
 
     """
-    # Data preprocessing.
-    prep_data = _preprocess_data(data)
-    # Perform prediction with model and preprocessed data.
-    #prediction = model.predict(prep_data)
-    # Format as list for output standardisation.
-    return prep_data #prediction[0].tolist()
+    try:
+        # Data preprocessing.
+        prep_data = _preprocess_data(data)
+        # Perform prediction with model and preprocessed data.
+        prediction = model.predict(prep_data)
+        # Format as list for output standardisation.
+        return 0 #prediction[0].tolist()
+    except:
+        myprint("error occured")
+        return 0 #prediction[0].tolist()
+    

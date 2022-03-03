@@ -1,5 +1,7 @@
 import pandas as pd
 
+train_df = pd.read_csv('utils/data/df_train.csv')
+test_df = train_df.drop(['load_shortfall_3h'], axis=1)
 
 def split_time(df):
     '''
@@ -38,6 +40,7 @@ def replace_valencia_pressure(df):
     Takes a pandas dataframe with three columns 'years', 'month', and 'Valencia_pressure'
     Replaces missing values in the 'Valencia_pressure' column with the monthly average
     '''
+    
     sub_df = df[['years', 'months', 'Valencia_pressure']]
     aggregate = sub_df.groupby(['years', 'months']).mean()
     

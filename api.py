@@ -21,6 +21,7 @@
 import pickle
 import json
 import numpy as np
+import pandas as pd
 from model import load_model, make_prediction
 from flask import Flask, request, jsonify
 
@@ -53,16 +54,9 @@ def model_prediction():
     data = request.get_json(force=True)
     # We then preprocess our data, and use our pretrained model to make a
     # prediction.
-    myprint('input')
-    myprint(data)
     output = make_prediction(data, static_model)
     # We finally package this prediction as a JSON object to deliver a valid
-    # response with our API.
-    for col in output.columns:
-        myprint(output[col])
-    myprint("output")
-    myprint(output)
-    return ""
+    return jsonify([output])
 
 # Configure Server Startup properties.
 # Note:
