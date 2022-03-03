@@ -36,8 +36,8 @@ feature_vector_json = test.iloc[1].to_json()
 # NOTE: When testing your instance of the API on a remote machine
 # replace the URL below with its public IP:
 
-url = 'http://127.0.0.1:5000/api_v0.1'
-#url = 'http://ec2-52-18-185-46.eu-west-1.compute.amazonaws.com:5000/api_v0.1'
+# url = 'http://127.0.0.1:5000/api_v0.1'
+url = 'http://ec2-63-33-69-188.eu-west-1.compute.amazonaws.com:5000/api_v0.1'
 
 # Perform the POST request.
 print(f"Sending POST request to web server API at: {url}")

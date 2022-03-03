@@ -39,7 +39,7 @@ from print_helper import myprint
 scaler = StandardScaler()
 
 test_df = pd.read_csv('utils/data/df_test.csv')
-#test_df = train_df.drop(['load_shortfall_3h'], axis=1)
+split_test_df = split_time(test_df)
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -73,8 +73,12 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
+    # we load the test data as well a the request data, because some steps such as 
+    # replacing missing values with averages, scaling and standardization can not be done if the dataframe has
+    # only one row.
+
+    # We split the time 
     req = split_time(req)
-    split_test_df = split_time(test_df)
     req = replace_valencia_pressure(req, split_test_df)
     split_test_df = replace_valencia_pressure(split_test_df.copy(), split_test_df)
     req = handle_categorical_column_v2(req)
@@ -88,7 +92,6 @@ def _preprocess_data(data):
     temp.columns = columns
     req = handle_colinear_temp_cols(temp)
     req = drop_columns(req)
-    #X = scaler.fit_transform(X)
     # ------------------------------------------------------------------------
 
     return req # this should be of type dataframe
